@@ -1,20 +1,45 @@
 "use client"
 import Link from "next/link"
-import React from "react"
+import React,{useState,useEffect} from "react"
 import { useRouter } from "next/navigation"
-import { axios } from "axios"
+import axios  from "axios"
 
 
 
 const SignupPage = () => {
+  const router=useRouter();
+
   const [user,setUser]=React.useState({
     email:"",
     password:"",
     username:""
   })
-  const onSignup=async()=>{
+  const [buttonDisabled, setButtonDisabled] = useState(true)
 
+  const onSignup=async()=>{
+    try {
+      const responce=await axios.post("/api/users/signup",user);
+      console.log("Signup Sucess",responce.data);
+      router.push('/login');
+    } catch (error:any) {
+      console.log("Signup Failed")
+      console.log(error.message);
+
+    }finally{
+
+    }
   }
+  useEffect(() => {
+      if(user.email.length>0 && user.password.length>0 &&user.username.length>0)
+      {
+        setButtonDisabled(false);
+      }
+      else
+      {
+        setButtonDisabled(true);
+      }
+  }, [user])
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-hscreen py-2">
@@ -55,7 +80,7 @@ const SignupPage = () => {
     <button 
     onClick={onSignup}
     type="button" 
-    className="p-2 bg-slate-200	 rounded-lg mb-4 focus:outline-none focus:broder-gray-600">Signup here</button>
+    className="p-2 bg-slate-200	 rounded-lg mb-4 focus:outline-none focus:broder-gray-600">{buttonDisabled?"No Signup":"Sign up"}</button>
     <Link href="/login">Visit Login Page</Link>
     </div>
 
